@@ -1,19 +1,20 @@
 import authRouter from './src/routes/authorization.route';
-import auth from './src/middleware/auth'
-import { Response } from "express";
 
 require("dotenv").config();
 const express = require("express");
+const cors = require('cors');
+
+const corsOptions = {
+    origin: '*',
+    optionsSuccessStatus: 200
+}
 
 const app = express();
 
-app.use(express.json({ limit: "50mb" }));
+app.use(express.json({ limit: "50mb" }), cors(corsOptions));
 
 app.use('/auth', authRouter);
 
-app.get("/welcome", auth, (req: Request, res: Response) => {
-    res.status(200).send("Welcome 🙌 ");
-});
 
 app.use("*", (req: any, res: any) => {
     res.status(404).json({
