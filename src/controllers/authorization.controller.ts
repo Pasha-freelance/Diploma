@@ -12,7 +12,6 @@ export const register = async (req: Request<any, any, IRegistrationDto>, res: Re
         }
 
     } catch (err) {
-        console.log(err);
         next(err)
     }
 }
@@ -27,7 +26,6 @@ export const login = async (req: Request<any, any, ILoginDto>, res: Response, ne
         }
 
     } catch (err) {
-        console.log(err);
         next(err)
     }
 }
