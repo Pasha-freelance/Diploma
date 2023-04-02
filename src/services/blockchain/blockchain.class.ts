@@ -32,7 +32,7 @@ export class BlockChain {
       console.log('[INFO] Block added successfully!');
     } else {
       this.chain.pop();
-      throw new Error('[ERROR] The Block chain is Invalid!');
+      throw new Error('[ERROR] The Blockchain is Invalid!');
     }
 
   }

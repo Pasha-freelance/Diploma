@@ -1,5 +1,6 @@
 import authRouter from './src/routes/authorization.route';
 import documentRouter from "./src/routes/document.route";
+import authMiddleware from "./src/middleware/auth.middleware";
 
 require("dotenv").config();
 const express = require("express");
@@ -15,8 +16,7 @@ const app = express();
 app.use(express.json({ limit: "50mb" }), cors(corsOptions));
 
 app.use('/auth', authRouter);
-app.use('/dashboard/documents', documentRouter);
-
+app.use('/dashboard/documents', authMiddleware, documentRouter);
 
 app.use("*", (req: any, res: any) => {
     res.status(404).json({

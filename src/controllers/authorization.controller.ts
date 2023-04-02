@@ -1,31 +1,36 @@
 import { Request, Response } from "express";
 import { ILoginDto, IRegistrationDto } from "../interfaces/registration-dto.interface";
-import * as service from '../services/authorization/authorization.service';
+import { AuthorizationService } from '../services/authorization/authorization-service.class';
 
-export const register = async (req: Request<any, any, IRegistrationDto>, res: Response, next: any) => {
+export class AuthorizationController {
+
+  public async register(req: Request<any, any, IRegistrationDto>, res: Response, next: any): Promise<void> {
     try {
-        const data = await service.register(req.body);
+      const s = new AuthorizationService();
+      const data = await s.register(req.body);
 
-        if (data) {
-            const result = res.status(data.status);
-            data.user ? result.json(data.user) : result.send(data.message);
-        }
+      if (data) {
+        const result = res.status(data.status);
+        data.response ? result.json(data.response) : result.send(data.message);
+      }
 
     } catch (err) {
-        next(err)
+      next(err);
     }
-}
+  }
 
-export const login = async (req: Request<any, any, ILoginDto>, res: Response, next: any) => {
+  public async login(req: Request<any, any, ILoginDto>, res: Response, next: any): Promise<void> {
     try {
-        const data = await service.login(req.body);
+      const s = new AuthorizationService();
+      const data = await s.login(req.body);
 
-        if (data) {
-            const result = res.status(data.status);
-            data.user ? result.json(data.user) : result.send(data.message);
-        }
+      if (data) {
+        const result = res.status(data.status);
+        data.response ? result.json(data.response) : result.send(data.message);
+      }
 
     } catch (err) {
-        next(err)
+      next(err);
     }
+  }
 }
