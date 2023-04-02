@@ -1,47 +1,48 @@
 import { Request } from "express";
-import * as service from '../services/document.service';
+import { BlockChain } from "../services/blockchain/blockchain.class";
+import { DigitalDocument } from "../services/documents/document.class";
+import { Block } from "../services/blockchain/block.class";
+import { DocumentDatabaseBridge } from "../services/documents/documentDBbridge.class";
+
+const blockChain = new BlockChain();
 
 export const uploadDocument = async (req: Request, res: any, next: any) => {
-    try {
-        if (!req.file) {
-            return res.status(400).json({ message: 'No file received' });
-        }
-
-        const { originalname, buffer, mimetype } = req.file;
-
-        // Process the file with blockchain technology
-        const blockHash = await service.processFileWithBlockchain(originalname, buffer, mimetype);
-
-        // Save the file to the database
-        await service.saveFile(originalname, buffer, blockHash, mimetype);
-
-        res.status(201).json({ message: 'File saved' });
-    } catch (err) {
-        console.error(err);
-        next(err);
-        res.status(500).json({ message: 'Internal server error' });
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file received' });
     }
+
+    const document = new DigitalDocument(req.file);
+    const block = new Block({ userId: req.body.userId, uuid: req.body.uuid }, document.metadata);
+
+    await blockChain.addBlock(block);
+    await document.addDocument();
+
+    res.json({ message: 'File saved' });
+  } catch (err) {
+    console.error(err);
+    next(err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 }
 
 export const getFile = async (req: Request, res: any, next: any) => {
-    try {
-        const file = await service.getFileByBlockHash(req.query.blockHash as string);
+  try {
+    const { uuid, userId } = req.query;
 
-        if (!file) {
-            return res.status(404).json({ message: 'File not found' });
-        }
-        // Verify the file with blockchain technology
-        const isVerified = await service.verifyFileWithBlockchain(file.name, file.blockHash, file.mimetype);
-
-        if (!isVerified) {
-            return res.status(401).json({ message: 'File not verified' });
-        }
-
-        res.contentType(file.mimetype);
-        res.send(file.data);
-    } catch (err: unknown) {
-        console.error(err);
-        next(err);
-        res.status(500).json({ message: 'Internal server error' });
+    if(!uuid) {
+      return res.status(400).json({ message: 'No info for block' });
     }
+
+    const block = await blockChain.getBlockByUUID(uuid as string);
+    const document = await DocumentDatabaseBridge.retrieveDocumentFromDatabase(block.docMetadata);
+
+    res.contentType(block.docMetadata.mimetype);
+    res.send(document.file);
+
+  } catch (err) {
+    console.error(err);
+    next(err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 };

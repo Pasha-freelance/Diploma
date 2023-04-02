@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { ILoginDto, IRegistrationDto } from "../interfaces/registration-dto.interface";
-import * as service from '../services/authorization.service';
+import * as service from '../services/authorization/authorization.service';
 
 export const register = async (req: Request<any, any, IRegistrationDto>, res: Response, next: any) => {
     try {

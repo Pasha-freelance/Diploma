@@ -1,5 +1,5 @@
-import { ILoginDto, IRegistrationDto } from "../interfaces/registration-dto.interface";
-import User from "../model/user.model";
+import { ILoginDto, IRegistrationDto } from "../../interfaces/registration-dto.interface";
+import User from "../../model/user.model";
 import jwt from "jsonwebtoken";
 
 const bcrypt = require("bcryptjs");
