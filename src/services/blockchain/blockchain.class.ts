@@ -8,7 +8,6 @@ export class BlockChain {
   private readonly proofOfWorkTime = 1000;
 
   constructor() {
-    console.log(11111)
     BlockChainDatabaseBridge.retrieveAllBlocksFromDatabase().then(data => this.initWithData(data as any));
   }
 
@@ -44,6 +43,10 @@ export class BlockChain {
 
   public async getBlockByUUID(uuid: string): Promise<Block> {
     return await BlockChainDatabaseBridge.retrieveBlockByUUID(uuid) as unknown as Block;
+  }
+
+  public async getBlocksByOriginUser(originUser: string): Promise<Block[]> {
+    return await BlockChainDatabaseBridge.retrieveBlocksForOriginUser(originUser) as unknown as Block[];
   }
 
   public get isValid(): boolean {

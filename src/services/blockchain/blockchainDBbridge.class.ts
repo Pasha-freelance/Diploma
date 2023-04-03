@@ -7,7 +7,14 @@ export class BlockChainDatabaseBridge {
     return BlockModel.find({});
   }
 
-  public static async retrieveBlockByUUID(uuid: string) {
+  public static async retrieveBlocksForOriginUser(originUser: string): Promise<Block[]> {
+    console.log(`[INFO] Retrieving blocks with for user: ${originUser} from db`);
+    const blocks = BlockModel.find({ originUser }) as unknown as Block[];
+    console.log(`[INFO] Retrieving blocks with for user: ${originUser} from db`);
+    return blocks;
+  }
+
+  public static async retrieveBlockByUUID(uuid: string): Promise<Block> {
     console.log(`[INFO] Retrieving block with uuid: ${uuid} from db`);
     const block = BlockModel.findOne({ uuid: uuid }) as unknown as Block;
     console.log(`[INFO] Retrieved block with uuid: ${uuid}, its hash: ${block.hash}`)

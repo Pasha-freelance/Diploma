@@ -38,8 +38,8 @@ export class DocumentsController {
     try {
       const { uuid, userId } = req.query;
 
-      if (!uuid) {
-        return res.status(400).json({ message: 'No info for block' });
+      if (!uuid || !userId) {
+        return res.status(400).json({ message: 'No required info received' });
       }
 
       const block = await this.blockChain.getBlockByUUID(uuid as string);
@@ -55,6 +55,36 @@ export class DocumentsController {
         res.send(document.file);
       } else {
         new Error('[ERROR] FILE is not retrieved !');
+      }
+
+    } catch (err) {
+      console.error(err);
+      next(err);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+
+  public async getAllDocuments(req: Request, res: any, next: any) {
+    try {
+      const { userId } = req.query;
+
+      if (!userId) {
+        return res.status(400).json({ message: 'No required info received' });
+      }
+
+      const blocks = await this.blockChain.getBlocksByOriginUser(userId as string);
+
+      if (blocks) {
+
+        res.json(blocks.map(block => (
+          {
+            originalName: block.docMetadata.originalname,
+            uuid: block.uuid
+          }
+        )));
+
+      } else {
+        new Error('No blocks')
       }
 
     } catch (err) {
