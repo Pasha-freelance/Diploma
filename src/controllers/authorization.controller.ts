@@ -4,10 +4,11 @@ import { AuthorizationService } from '../services/authorization/authorization-se
 
 export class AuthorizationController {
 
+  private readonly service = new AuthorizationService();
+
   public async register(req: Request<any, any, IRegistrationDto>, res: Response, next: any): Promise<void> {
     try {
-      const s = new AuthorizationService();
-      const data = await s.register(req.body);
+      const data = await this.service.register(req.body);
 
       if (data) {
         const result = res.status(data.status);
@@ -22,7 +23,7 @@ export class AuthorizationController {
   public async login(req: Request<any, any, ILoginDto>, res: Response, next: any): Promise<void> {
     try {
       const s = new AuthorizationService();
-      const data = await s.login(req.body);
+      const data = await this.service.login(req.body);
 
       if (data) {
         const result = res.status(data.status);

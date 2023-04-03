@@ -4,11 +4,9 @@ import { DigitalDocument } from "../services/documents/document.class";
 import { Block } from "../services/blockchain/block.class";
 import { DocumentDatabaseBridge } from "../services/documents/documentDBbridge.class";
 
-const blockChain = new BlockChain();
-
 export class DocumentsController {
 
-  private b = blockChain;
+  private readonly blockChain = new BlockChain();
 
   public async uploadDocument(req: Request, res: any, next: any) {
     try {
@@ -21,10 +19,10 @@ export class DocumentsController {
         req.file,
         block.timestamp,
         block.hash,
-        block.originUser || ''
+        block.originUser
       );
 
-      await this.b.addBlock(block);
+      await this.blockChain.addBlock(block);
       await document.saveDocument();
 
       res.json({ message: 'File saved' });
@@ -44,12 +42,12 @@ export class DocumentsController {
         return res.status(400).json({ message: 'No info for block' });
       }
 
-      const block = await blockChain.getBlockByUUID(uuid as string);
+      const block = await this.blockChain.getBlockByUUID(uuid as string);
       const document = await DocumentDatabaseBridge.retrieveDocumentFromDatabase(
         block.docMetadata,
         block.timestamp,
         block.hash,
-        block.originUser || ''
+        block.originUser
       );
 
       if (document) {

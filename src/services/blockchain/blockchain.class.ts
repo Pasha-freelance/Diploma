@@ -8,6 +8,7 @@ export class BlockChain {
   private readonly proofOfWorkTime = 1000;
 
   constructor() {
+    console.log(11111)
     BlockChainDatabaseBridge.retrieveAllBlocksFromDatabase().then(data => this.initWithData(data as any));
   }
 

@@ -6,6 +6,6 @@ const documentRouter = Router();
 const documentsController = new DocumentsController();
 
 documentRouter.post('/upload', uploadFile.single('file'), documentsController.uploadDocument.bind(documentsController));
-documentRouter.get('/upload', documentsController.getFile.bind(this));
+documentRouter.get('/upload', documentsController.getFile.bind(documentsController));
 
 export default documentRouter;
