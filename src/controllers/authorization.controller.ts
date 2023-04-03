@@ -22,7 +22,6 @@ export class AuthorizationController {
 
   public async login(req: Request<any, any, ILoginDto>, res: Response, next: any): Promise<void> {
     try {
-      const s = new AuthorizationService();
       const data = await this.service.login(req.body);
 
       if (data) {
