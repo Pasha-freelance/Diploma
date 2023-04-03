@@ -39,7 +39,7 @@ export class AuthorizationService {
       lastName,
       email: email.toLowerCase(), // sanitize: convert email to lowercase
       password: encryptedPassword,
-      userId: crypto.randomUUID()
+      userId: 'pf-' + crypto.randomUUID()
     });
 
     await userDB.save();

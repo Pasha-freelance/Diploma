@@ -11,10 +11,9 @@ export class Block {
   public readonly hash: string = '';
   public readonly docMetadata: IDocumentMetadata = {} as IDocumentMetadata;
   public prevHash: string = '';
-
-  private readonly originUser: string = '';
-  private readonly uuid: string = '';
-  private readonly timestamp: string = '';
+  public readonly originUser: string = '';
+  public readonly uuid: string = '';
+  public readonly timestamp: string = '';
 
   constructor(
     private data: IBlockProps,
@@ -22,13 +21,12 @@ export class Block {
   ) {
     this.docMetadata = this.docData;
     this.originUser = this.data.userId;
-    this.uuid = this.data.uuid;
     this.timestamp = Date.now().toString();
-    this.hash = this.calcHash();
+    this.hash = this.getHash();
     this.uuid = randomUUID();
   }
 
-  private calcHash(): string {
+  public getHash(): string {
     return crypto
       .createHash('sha256')
       .update(this.prevHash || '')

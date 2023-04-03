@@ -1,27 +1,46 @@
 import { IDocumentMetadata } from "../../model/blockchain.model";
-import { DocumentBridge } from "../blockDocumentBridge.class";
 import { DocumentDatabaseBridge } from "./documentDBbridge.class";
+import crypto from "crypto";
 
 export class DigitalDocument {
 
-  private readonly hash: string = '';
+  private hash: string = '';
   public readonly file: Buffer;
 
   constructor(
-    private _file: Express.Multer.File
+    private _file: Express.Multer.File,
+    private timestamp: string,
+    private blockHash: string,
+    private originUser: string
   ){
-    this.hash = DocumentBridge.getDocHash(this.metadata);
     this.file = this._file.buffer;
+    this.hash = DigitalDocument.getDocHash(DigitalDocument.metadata(_file), timestamp, blockHash, originUser);
   }
 
-  public get metadata(): IDocumentMetadata {
+  public static metadata(file: Express.Multer.File): IDocumentMetadata {
     return {
-      originalname: this._file.originalname,
-      mimetype: this._file.mimetype
+      originalname: file.originalname,
+      mimetype: file.mimetype
     }
   }
 
-  public addDocument(): Promise<void> {
+  public static getDocHash(
+    metadata: IDocumentMetadata,
+    timestamp: string,
+    blockHash: string,
+    originUser: string
+  ): string {
+    return crypto
+      .createHash('sha256')
+      .update(metadata.mimetype)
+      .update(metadata.originalname)
+      .update(timestamp)
+      .update(blockHash)
+      .update(originUser)
+      .digest('hex')
+  }
+
+  public saveDocument(): Promise<void> {
     return DocumentDatabaseBridge.saveDocument(this)
   }
 }
