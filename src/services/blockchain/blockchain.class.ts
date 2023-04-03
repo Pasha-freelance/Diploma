@@ -20,16 +20,19 @@ export class BlockChain {
     }
   }
 
-  public async addBlock(block: Block): Promise<void> {
+  public async addBlock(block: Block): Promise<boolean> {
     block.prevHash = this.lastBlock?.hash || '';
+    block.recalculateHash();
+
     console.log('[INFO] Block is adding...');
 
     await this.proofOfWork();
     this.chain.push(Object.freeze(block));
 
     if (this.isValid) {
-      await BlockChainDatabaseBridge.saveBlock(block);
+      const isSaved = await BlockChainDatabaseBridge.saveBlock(block);
       console.log('[INFO] Block added successfully!');
+      return isSaved;
     } else {
       this.chain.pop();
       throw new Error('[ERROR] The Blockchain is Invalid!');
@@ -51,19 +54,16 @@ export class BlockChain {
 
   public get isValid(): boolean {
     return this.chain.every((block, i) =>
+      i === 0 ||
       (
-        i >= 1 &&
-        this.chain[i - 1].hash === block.prevHash &&
+        this.chain[i - 1].hash === block.prevHash && // check if prev block hash equal to current hash
         (
           this.chain[i + 1]
-            ? this.chain[i + 1].prevHash === block.hash
-            : true
+            ? this.chain[i + 1].prevHash === block.hash // check if next block hash equal to current hash
+            : block instanceof Block && block.isHashValid //check if new block hash is valid
         )
-      ) ||
-      (
-        i === 0
       )
-    )
+    );
   }
 
   private get lastBlock(): Block {

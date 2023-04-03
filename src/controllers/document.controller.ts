@@ -22,8 +22,9 @@ export class DocumentsController {
         block.originUser
       );
 
-      await this.blockChain.addBlock(block);
-      await document.saveDocument();
+      const isBlockSaved = await this.blockChain.addBlock(block);
+      if (isBlockSaved) await document.saveDocument();
+      else new Error();
 
       res.json({ message: 'File saved' });
 

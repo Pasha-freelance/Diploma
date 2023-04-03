@@ -8,7 +8,7 @@ export interface IBlockProps {
 
 export class Block {
 
-  public readonly hash: string = '';
+  public hash: string = '';
   public readonly docMetadata: IDocumentMetadata = {} as IDocumentMetadata;
   public prevHash: string = '';
   public readonly originUser: string = '';
@@ -22,14 +22,22 @@ export class Block {
     this.docMetadata = this.docData;
     this.originUser = this.data.userId;
     this.timestamp = Date.now().toString();
-    this.hash = this.getHash();
+    this.recalculateHash();
     this.uuid = randomUUID();
   }
 
-  public getHash(): string {
+  public recalculateHash(): void {
+    this.hash = this.getHash();
+  }
+
+  public get isHashValid(): boolean {
+    return this.hash === this.getHash();
+  }
+
+  private getHash(): string {
     return crypto
       .createHash('sha256')
-      .update(this.prevHash || '')
+      .update(this.prevHash)
       .update(this.timestamp)
       .digest('hex')
   }
