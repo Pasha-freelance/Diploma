@@ -13,17 +13,18 @@ export class DocumentsController {
       if (!req.file) {
         return res.status(400).json({ message: 'No file received' });
       }
-
-      const block = new Block({ userId: req.body.userId, uuid: req.body.uuid }, DigitalDocument.metadata(req.file));
-      const document = new DigitalDocument(
-        req.file,
-        block.timestamp,
-        block.hash,
-        block.originUser
-      );
-
+      const block = new Block({ userId: req.query.userId + ''  }, DigitalDocument.metadata(req.file));
       const isBlockSaved = await this.blockChain.addBlock(block);
-      if (isBlockSaved) await document.saveDocument();
+
+      if (isBlockSaved) {
+        const document = new DigitalDocument(
+          req.file,
+          block.timestamp,
+          block.hash,
+          block.originUser
+        );
+        await document.saveDocument();
+      }
       else new Error();
 
       res.json({ message: 'File saved' });

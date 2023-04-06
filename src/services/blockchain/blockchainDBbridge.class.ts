@@ -16,7 +16,7 @@ export class BlockChainDatabaseBridge {
 
   public static async retrieveBlockByUUID(uuid: string): Promise<Block> {
     console.log(`[INFO] Retrieving block with uuid: ${uuid} from db`);
-    const block = BlockModel.findOne({ uuid: uuid }) as unknown as Block;
+    const block = await BlockModel.findOne({ uuid }) as unknown as Block;
     console.log(`[INFO] Retrieved block with uuid: ${uuid}, its hash: ${block.hash}`)
     return block;
   }

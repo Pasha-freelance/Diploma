@@ -45,12 +45,9 @@ export class AuthorizationService {
     await userDB.save();
 
     const token = jwt.sign(
-        { user_id: userDB._id, email },
-        process.env.TOKEN_KEY as string,
-        {
-          expiresIn: "2h",
-        }
-      );
+      { user_id: userDB._id, email },
+      process.env.TOKEN_KEY as string,
+    );
 
     response = {
       email: userDB.email,
@@ -84,9 +81,6 @@ export class AuthorizationService {
       const token = jwt.sign(
         { user_id: userDB._id, email },
         process.env.TOKEN_KEY as string,
-        {
-          expiresIn: "2h",
-        }
       );
 
       response = {
@@ -103,5 +97,25 @@ export class AuthorizationService {
     status = 401;
     return { response, message, status };
   };
+
+  public async getUser(body: any) {
+    // Get user input
+    const { userId } = body;
+
+    // Validate if user exist in our database
+    const userDB = await User.findOne({ userId });
+    if (userDB) {
+      return {
+        response: {
+          userId: userDB.userId,
+          firstName: userDB.firstName,
+          lastName: userDB.lastName,
+          email: userDB.email
+        }
+      }
+    }
+    return { status: 500, message: 'User does not exist' };
+
+  }
 }
 

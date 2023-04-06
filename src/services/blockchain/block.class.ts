@@ -3,7 +3,6 @@ import crypto, { randomUUID } from "crypto";
 
 export interface IBlockProps {
   userId: string;
-  uuid: string;
 }
 
 export class Block {

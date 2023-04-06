@@ -33,4 +33,17 @@ export class AuthorizationController {
       next(err);
     }
   }
+
+  public async getUser(req: any, res: Response, next: any) {
+    try {
+      const data = await this.service.getUser(req.query);
+
+      if (data) {
+         data.response ? res.json(data.response) : res.status(data.status).send(data.message)
+      }
+
+    } catch (err) {
+      next(err);
+    }
+  }
 }
