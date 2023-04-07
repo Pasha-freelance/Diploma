@@ -95,7 +95,7 @@ export class AuthorizationService {
     }
     message = "Invalid Credentials";
     status = 401;
-    return { response, message, status };
+    return { response: null, error: message, status };
   };
 
   public async getUser(body: any) {

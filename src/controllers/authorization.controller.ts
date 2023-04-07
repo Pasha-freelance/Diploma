@@ -26,7 +26,7 @@ export class AuthorizationController {
 
       if (data) {
         const result = res.status(data.status);
-        data.response ? result.json(data.response) : result.send(data.message);
+        data.response ? result.json(data.response) : result.send( data.error );
       }
 
     } catch (err) {
