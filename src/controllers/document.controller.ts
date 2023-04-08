@@ -3,6 +3,7 @@ import { BlockChain } from "../services/blockchain/blockchain.class";
 import { DigitalDocument } from "../services/documents/document.class";
 import { Block } from "../services/blockchain/block.class";
 import { DocumentDatabaseBridge } from "../services/documents/documentDBbridge.class";
+import { AllowedUsersService } from "../services/allowedUsers/allowed-users.service";
 
 export class DocumentsController {
 
@@ -13,7 +14,8 @@ export class DocumentsController {
       if (!req.file) {
         return res.status(400).json({ message: 'No file received' });
       }
-      const block = new Block({ userId: req.query.userId + ''  }, DigitalDocument.metadata(req.file));
+      const lastHash = this.blockChain.lastBlock.hash;
+      const block = new Block({ userId: req.query.userId + '', prevHash: lastHash  }, DigitalDocument.metadata(req.file));
       const isBlockSaved = await this.blockChain.addBlock(block);
 
       if (isBlockSaved) {
@@ -27,7 +29,25 @@ export class DocumentsController {
       }
       else new Error();
 
-      res.json({ message: 'File saved' });
+      res.json({ message: 'File saved', uuid: block.uuid });
+
+    } catch (err) {
+      console.error(err);
+      next(err);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+  public async attachAllowedUsers(req: Request, res: any, next: any) {
+    try {
+      //NOTE doesn`t work with POSTMAN(works only with query params ???)
+      const { uuid, allowedUsers } = req.body;
+
+      if(!uuid) {
+        return res.status(500).json({ message: 'No uuid for allowed users received' });
+      }
+      await AllowedUsersService.attach(uuid, allowedUsers);
+      return res.json({ message: 'Allowed users added'});
 
     } catch (err) {
       console.error(err);

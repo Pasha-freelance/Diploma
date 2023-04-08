@@ -7,6 +7,8 @@ const documentRouter = Router();
 const documentsController = new DocumentsController();
 
 documentRouter.post('/upload', authMiddleware, uploadFile.single('file'), documentsController.uploadDocument.bind(documentsController));
+documentRouter.post('/attachAllowedUsers', documentsController.attachAllowedUsers.bind(documentsController));
+
 documentRouter.get('/download', documentsController.getFile.bind(documentsController));
 documentRouter.get('/downloadAll', authMiddleware, documentsController.getAllDocuments.bind(documentsController));
 

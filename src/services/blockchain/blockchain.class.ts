@@ -5,7 +5,6 @@ import { BlockChainDatabaseBridge } from "./blockchainDBbridge.class";
 export class BlockChain {
 
   private readonly chain: Readonly<Block>[] = [];
-  private readonly proofOfWorkTime = 1000;
 
   constructor() {
     BlockChainDatabaseBridge.retrieveAllBlocksFromDatabase().then(data => this.initWithData(data as any));
@@ -21,15 +20,11 @@ export class BlockChain {
   }
 
   public async addBlock(block: Block): Promise<boolean> {
-    block.prevHash = this.lastBlock?.hash || '';
-    block.recalculateHash();
-
     console.log('[INFO] Block is adding...');
 
-    await this.proofOfWork();
     this.chain.push(Object.freeze(block));
 
-    if (this.isValid) {
+    if (block.isValid(block.nonce)) {
       const isSaved = await BlockChainDatabaseBridge.saveBlock(block);
       console.log('[INFO] Block added successfully!');
       return isSaved;
@@ -38,10 +33,6 @@ export class BlockChain {
       throw new Error('[ERROR] The Blockchain is Invalid!');
     }
 
-  }
-
-  private async proofOfWork(): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, this.proofOfWorkTime));
   }
 
   public async getBlockByUUID(uuid: string): Promise<Block> {
@@ -60,13 +51,13 @@ export class BlockChain {
         (
           this.chain[i + 1]
             ? this.chain[i + 1].prevHash === block.hash // check if next block hash equal to current hash
-            : block instanceof Block && block.isHashValid //check if new block hash is valid
+            : block instanceof Block && block.isValid(block.nonce) //check if new block hash is valid
         )
       )
     );
   }
 
-  private get lastBlock(): Block {
+  public get lastBlock(): Block {
     return <Block>this.chain.at(-1);
   }
 }

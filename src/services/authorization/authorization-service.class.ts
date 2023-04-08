@@ -117,5 +117,20 @@ export class AuthorizationService {
     return { status: 500, message: 'User does not exist' };
 
   }
+
+  public async getUsersByEmail(body: any) {
+    // Get user input
+    const { email } = body;
+
+    // Validate if user exist in our database
+    const users = await User.find() as IUser[];
+
+    return users.filter(u => u.email.startsWith(email)).map((user) => ({
+      userId: user.userId,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email
+    }));
+  }
 }
 

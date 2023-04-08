@@ -12,6 +12,7 @@ export interface IBlock {
   docMetadata: IDocumentMetadata;
   uuid: string;
   timestamp: string;
+  nonce: number;
 }
 
 const blockSchema = new Schema({
@@ -21,6 +22,7 @@ const blockSchema = new Schema({
   docMetadata: Object,
   uuid: String,
   timestamp: String,
+  nonce: Number
 });
 
 export default model<IBlock>('BlockChain', blockSchema);

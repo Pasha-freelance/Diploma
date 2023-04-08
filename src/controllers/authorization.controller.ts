@@ -46,4 +46,17 @@ export class AuthorizationController {
       next(err);
     }
   }
+
+  public async getUsersByEmail(req: any, res: Response, next: any) {
+    try {
+      const data = await this.service.getUsersByEmail(req.query);
+
+      if (data) {
+       res.json({ users: data})
+      }
+
+    } catch (err) {
+      next(err);
+    }
+  }
 }
