@@ -28,7 +28,8 @@ export class BlockChain {
     this.chain.push(Object.freeze(block));
 
     if (block.isValid(block.nonce)) {
-      await deployContract(block.data);
+      const a =  await deployContract(block.data);
+      console.log(a)
       const isSaved = await BlockChainDatabaseBridge.saveBlock(block);
       console.log('[INFO] Block added successfully!');
       return isSaved;

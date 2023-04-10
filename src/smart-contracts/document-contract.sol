@@ -3,6 +3,13 @@ pragma solidity ^0.8.7;
 
 contract DocumentContract {
 
+  constructor(
+    string memory uuid,
+    Data memory info
+  ) {
+    data[uuid] = info;
+  }
+
   struct Data {
     string hash;
     string prevHash;

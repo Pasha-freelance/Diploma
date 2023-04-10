@@ -15,11 +15,9 @@ export default async function main(block: IBlock) {
   const contractFactory = new ethers.ContractFactory(abi, bin, wallet);
 
   console.log('[INFO] Contract is deploying...');
-  const contract = await contractFactory.deploy();
+  const contract = await contractFactory.deploy(block.uuid, block);
   await contract.waitForDeployment();
   console.log('[INFO] Contract is deployed successfully!');
-
-  await contract.setData(block.uuid, block);
 
   return await contract.getData(block.uuid);
 }
