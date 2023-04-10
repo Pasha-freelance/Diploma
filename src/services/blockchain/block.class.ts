@@ -16,16 +16,16 @@ export class Block implements IBlock {
   public readonly uuid: string;
   public readonly timestamp: string;
 
-  public readonly NETWORK_POWER = 10000;
+  private readonly NETWORK_POWER = 10000;
 
   constructor(
-    private data: IBlockProps,
+    private _data: IBlockProps,
     private docData: IDocumentMetadata
   ) {
     this.docMetadata = this.docData;
-    this.originUser = this.data.userId;
+    this.originUser = this._data.userId;
+    this.prevHash = this._data.prevHash;
     this.timestamp = Date.now().toString();
-    this.prevHash = this.data.prevHash;
     this.uuid = randomUUID();
     this.initHash();
     console.log(`[INFO] Block with hash ${this.hash} created`);
@@ -41,19 +41,34 @@ export class Block implements IBlock {
     return this.hash === this.getCryptoHash(nonce) && this.nonce === nonce;
   }
 
-  protected getCryptoHash(nonce: number): string {
+  public get data(): IBlock {
+    return {
+      hash: this.hash,
+      prevHash: this.prevHash,
+      originUser: this.originUser,
+      docMetadata: {
+        originalname: this.docMetadata.originalname,
+        mimetype: this.docMetadata.mimetype,
+      },
+      uuid: this.uuid,
+      timestamp: this.timestamp,
+      nonce: this.nonce,
+    } as IBlock;
+  }
+
+  private getCryptoHash(nonce: number): string {
     return crypto.createHash('sha256').update(this.hashProps + nonce).digest('hex');
   }
 
-  protected get hashProps(): string {
+  private get hashProps(): string {
     return this.prevHash + this.timestamp;
   }
 
-  protected convertNumberToCharCodesString(num: number): number {
+  private convertNumberToCharCodesString(num: number): number {
     return +num.toString().split('').map(c => c.charCodeAt(0)).join('');
   }
 
-  protected get _hash(): {hash: string; nonce: number;} {
+  private get _hash(): { hash: string; nonce: number; } {
     let counter = 0;
     let nonce = 0;
     let hash = '';

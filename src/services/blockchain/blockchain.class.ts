@@ -1,6 +1,7 @@
-import { IDocumentMetadata } from "../../model/blockchain.model"
 import { Block, IBlockProps } from "./block.class";
 import { BlockChainDatabaseBridge } from "./blockchainDBbridge.class";
+import deployContract from '../../smart-contracts/deploy';
+import { IDocumentMetadata } from "../../model/blockchain.model";
 
 export class BlockChain {
 
@@ -21,10 +22,13 @@ export class BlockChain {
 
   public async addBlock(block: Block): Promise<boolean> {
     console.log('[INFO] Block is adding...');
+    // const address = await deployContract(block.data);
+    // block.address = address.address;
 
     this.chain.push(Object.freeze(block));
 
     if (block.isValid(block.nonce)) {
+      await deployContract(block.data);
       const isSaved = await BlockChainDatabaseBridge.saveBlock(block);
       console.log('[INFO] Block added successfully!');
       return isSaved;
