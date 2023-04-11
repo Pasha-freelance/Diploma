@@ -7,7 +7,6 @@
     "startDb": "C:/mongodb/bin/mongod.exe && C:/mongosh/bin/mongosh.exe",
     "build": "npx tsc",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\"",
-    "deploy-contract": "node src/smart-contracts/deploy",
     "compile-contract": "solcjs --bin --abi --include-path node_modules/ --base-path . -o src/smart-contracts/ src/smart-contracts/document-contract.sol",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -11,8 +11,8 @@ export interface IBlock {
   originUser: string;
   docMetadata: IDocumentMetadata;
   uuid: string;
-  timestamp: string;
-  nonce: number;
+  timestamp: number;
+  nonce: string;
 }
 
 const blockSchema = new Schema({
@@ -21,8 +21,8 @@ const blockSchema = new Schema({
   originUser: String,
   docMetadata: Object,
   uuid: String,
-  timestamp: String,
-  nonce: Number
+  timestamp: Number,
+  nonce: String
 });
 
 export default model<IBlock>('BlockChain', blockSchema);

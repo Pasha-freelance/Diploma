@@ -14,8 +14,8 @@ export class DocumentsController {
       if (!req.file) {
         return res.status(400).json({ message: 'No file received' });
       }
-      const lastHash = this.blockChain.lastBlock.hash;
-      const block = new Block({ userId: req.query.userId + '', prevHash: lastHash  }, DigitalDocument.metadata(req.file));
+
+      const block = new Block({ userId: req.query.userId + '' }, DigitalDocument.metadata(req.file));
       const isBlockSaved = await this.blockChain.addBlock(block);
 
       if (isBlockSaved) {

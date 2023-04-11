@@ -6,7 +6,7 @@ export class DocumentDatabaseBridge {
 
   public static async retrieveDocumentFromDatabase(
     metadata: IDocumentMetadata,
-    timestamp: string,
+    timestamp: number,
     blockHash: string,
     originUser: string
   ) {

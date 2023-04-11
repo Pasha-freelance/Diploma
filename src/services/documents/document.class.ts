@@ -9,7 +9,7 @@ export class DigitalDocument {
 
   constructor(
     private _file: Express.Multer.File,
-    private timestamp: string,
+    private timestamp: number,
     private blockHash: string,
     private originUser: string
   ){
@@ -21,12 +21,12 @@ export class DigitalDocument {
     return {
       originalname: file.originalname,
       mimetype: file.mimetype
-    }
+    };
   }
 
   public static getDocHash(
     metadata: IDocumentMetadata,
-    timestamp: string,
+    timestamp: number,
     blockHash: string,
     originUser: string
   ): string {
@@ -34,13 +34,13 @@ export class DigitalDocument {
       .createHash('sha256')
       .update(metadata.mimetype)
       .update(metadata.originalname)
-      .update(timestamp)
+      .update(timestamp.toString())
       .update(blockHash)
       .update(originUser)
-      .digest('hex')
+      .digest('hex');
   }
 
   public saveDocument(): Promise<void> {
-    return DocumentDatabaseBridge.saveDocument(this)
+    return DocumentDatabaseBridge.saveDocument(this);
   }
 }

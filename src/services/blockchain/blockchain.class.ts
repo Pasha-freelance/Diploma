@@ -1,7 +1,6 @@
-import { Block, IBlockProps } from "./block.class";
+import { Block } from "./block.class";
 import { BlockChainDatabaseBridge } from "./blockchainDBbridge.class";
-import deployContract from '../../smart-contracts/deploy';
-import { IDocumentMetadata } from "../../model/blockchain.model";
+import { deployContract, getGenesisBlock } from '../../smart-contracts/deploy';
 
 export class BlockChain {
 
@@ -15,21 +14,20 @@ export class BlockChain {
     this.chain.push(...(data || []));
 
     if (!this.chain.length) {
-      //add genesis block
-      await this.addBlock(new Block({} as IBlockProps, {} as IDocumentMetadata));
+      await this.initGenesisBlock();
     }
   }
 
   public async addBlock(block: Block): Promise<boolean> {
     console.log('[INFO] Block is adding...');
-    // const address = await deployContract(block.data);
-    // block.address = address.address;
 
+    const deployedTransaction = await deployContract(block.dataForContract);
+    block.updateWithTx(deployedTransaction);
+
+    const lastHash = this.chain.at(-1)?.hash as string;
     this.chain.push(Object.freeze(block));
 
-    if (block.isValid(block.nonce)) {
-      const a =  await deployContract(block.data);
-      console.log(a)
+    if (block.isValid(lastHash)) {
       const isSaved = await BlockChainDatabaseBridge.saveBlock(block);
       console.log('[INFO] Block added successfully!');
       return isSaved;
@@ -37,7 +35,6 @@ export class BlockChain {
       this.chain.pop();
       throw new Error('[ERROR] The Blockchain is Invalid!');
     }
-
   }
 
   public async getBlockByUUID(uuid: string): Promise<Block> {
@@ -48,18 +45,16 @@ export class BlockChain {
     return await BlockChainDatabaseBridge.retrieveBlocksForOriginUser(originUser) as unknown as Block[];
   }
 
-  public get isValid(): boolean {
-    return this.chain.every((block, i) =>
-      i === 0 ||
-      (
-        this.chain[i - 1].hash === block.prevHash && // check if prev block hash equal to current hash
-        (
-          this.chain[i + 1]
-            ? this.chain[i + 1].prevHash === block.hash // check if next block hash equal to current hash
-            : block instanceof Block && block.isValid(block.nonce) //check if new block hash is valid
-        )
-      )
-    );
+  private async initGenesisBlock(): Promise<void> {
+    console.log('[INFO] Init genesis block...');
+    const genesisBlock = new Block({ userId: ''}, { originalname: '', mimetype: '' });
+
+    const deployedGenesisBlock = await getGenesisBlock();
+    genesisBlock.updateWithTx(deployedGenesisBlock);
+
+    this.chain.push(Object.freeze(genesisBlock));
+    await BlockChainDatabaseBridge.saveBlock(genesisBlock);
+    console.log('[INFO] Genesis block is initialized!');
   }
 
   public get lastBlock(): Block {

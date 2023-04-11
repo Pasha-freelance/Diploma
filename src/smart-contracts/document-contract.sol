@@ -11,12 +11,8 @@ contract DocumentContract {
   }
 
   struct Data {
-    string hash;
-    string prevHash;
     string originUser;
     string uuid;
-    string timestamp;
-    int nonce;
     Metadata docMetadata;
   }
 
@@ -29,9 +25,5 @@ contract DocumentContract {
 
   function getData(string memory uuid) public view returns (Data memory) {
     return data[uuid];
-  }
-
-  function setData(string memory uuid, Data memory info) public {
-    data[uuid] = info;
   }
 }
