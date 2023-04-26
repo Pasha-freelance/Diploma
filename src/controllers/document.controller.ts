@@ -46,8 +46,37 @@ export class DocumentsController {
       if(!uuid) {
         return res.status(500).json({ message: 'No uuid for allowed users received' });
       }
-      await AllowedUsersService.attach(uuid, allowedUsers);
+      const block = await this.blockChain.getBlockByUUID(uuid);
+      await AllowedUsersService.attach(uuid, block.address, allowedUsers);
       return res.json({ message: 'Allowed users added'});
+
+    } catch (err) {
+      console.error(err);
+      next(err);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+  public async getAllowedToMeDocuments(req: Request, res: any, next: any) {
+    try {
+      const { userId } = req.query;
+
+      if(!userId) {
+        return res.status(500).json({ message: 'No userId for allowed users received' });
+      }
+      const blocks = await this.blockChain.getAllowedBlocks(userId as string);
+      if (blocks) {
+
+        res.json(blocks.map(block => (
+          {
+            originalName: block.docMetadata.originalname,
+            uuid: block.uuid
+          }
+        )));
+
+      } else {
+        new Error('No blocks')
+      }
 
     } catch (err) {
       console.error(err);

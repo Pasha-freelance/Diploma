@@ -5,6 +5,7 @@ export interface ITransactionDto {
   prevHash: string;
   timestamp: number;
   nonce: string;
+  address: string;
 }
 
 export interface IContractDto {

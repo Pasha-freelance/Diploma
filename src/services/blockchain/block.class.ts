@@ -15,6 +15,7 @@ export class Block implements IBlock {
   public readonly originUser: string;
   public readonly uuid: string;
   public timestamp: number = 0;
+  public address: string = '';
 
   private readonly NETWORK_POWER = 10000;
 
@@ -38,6 +39,7 @@ export class Block implements IBlock {
     this.prevHash = data.prevHash;
     this.timestamp = data.timestamp;
     this.nonce = data.nonce;
+    this.address = data.address;
     console.log(`[INFO] Block with hash ${this.hash} updated with transaction!`);
   }
 

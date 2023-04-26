@@ -45,6 +45,10 @@ export class BlockChain {
     return await BlockChainDatabaseBridge.retrieveBlocksForOriginUser(originUser) as unknown as Block[];
   }
 
+  public async getAllowedBlocks(userId: string): Promise<Block[]> {
+    return await BlockChainDatabaseBridge.getAllowedBlocks(userId) as unknown as Block[];
+  }
+
   private async initGenesisBlock(): Promise<void> {
     console.log('[INFO] Init genesis block...');
     const genesisBlock = new Block({ userId: ''}, { originalname: '', mimetype: '' });

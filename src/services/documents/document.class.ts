@@ -34,7 +34,6 @@ export class DigitalDocument {
       .createHash('sha256')
       .update(metadata.mimetype)
       .update(metadata.originalname)
-      .update(timestamp.toString())
       .update(blockHash)
       .update(originUser)
       .digest('hex');

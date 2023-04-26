@@ -12,5 +12,6 @@ documentRouter.post('/attachAllowedUsers', authMiddleware, documentsController.a
 documentRouter.get('/download', documentsController.getFile.bind(documentsController));
 documentRouter.get('/downloadAll', authMiddleware, documentsController.getAllDocuments.bind(documentsController));
 documentRouter.get('/usersToAttach', authMiddleware, documentsController.getUsersToAttach.bind(documentsController));
+documentRouter.get('/allowedToMe', authMiddleware, documentsController.getAllowedToMeDocuments.bind(documentsController));
 
 export default documentRouter;

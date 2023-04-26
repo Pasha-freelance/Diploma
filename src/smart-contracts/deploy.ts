@@ -1,4 +1,11 @@
-import { BaseContract, Block, ContractFactory, ContractTransactionReceipt, JsonRpcProvider, Wallet } from 'ethers';
+import {
+  BaseContract,
+  Block,
+  Contract,
+  ContractFactory, ContractTransactionReceipt,
+  JsonRpcProvider,
+  Wallet
+} from 'ethers';
 import fs from 'fs';
 import { IContractDto, ITransactionDto } from "../interfaces/transaction-dto.interface";
 
@@ -13,15 +20,15 @@ const contractFactory = new ContractFactory(abi, bin, wallet);
 export async function deployContract(block: IContractDto): Promise<ITransactionDto> {
 
   let contract: BaseContract;
+  let contractAddress: string;
   let response: ITransactionDto;
   console.log('[INFO] Contract is deploying...');
 
   try {
-    contract = await contractFactory.deploy(block.uuid, block);
-    const n = await contract.getFunction('setData');
-    await n(block.uuid, block)
-
+    contract = await contractFactory.deploy();
+    contractAddress = await contract.getAddress();
     const receipt = await contract.deploymentTransaction()?.wait(1) as ContractTransactionReceipt;
+    await evaluateContractMethod(contractAddress, 'init', block);
     const deployedBlock = await receipt.getBlock();
 
     response = {
@@ -29,19 +36,25 @@ export async function deployContract(block: IContractDto): Promise<ITransactionD
       prevHash: deployedBlock.parentHash,
       timestamp: deployedBlock.timestamp,
       nonce: deployedBlock.nonce,
+      address: contractAddress
     };
 
-    const a = await contract.getFunction('getData');
 
-    const b = await a('d02871db-f982-4908-89c8-66dce48c3d2b')
-    console.log(b)
-
-    console.log(`[INFO] Contract with hash ${deployedBlock.hash} is deployed successfully!`);
+    console.log(`[INFO] Contract is deployed successfully!`);
   } catch (e) {
     console.error(e);
     throw new Error('[ERROR] Error during contract deploying');
   }
 
+  return response;
+}
+
+export async function evaluateContractMethod(address: string, method: string, props?: any): Promise<any> {
+  console.log(`[INFO] Evaluating contract method: ${method}`);
+  const contract = new Contract(address, JSON.parse(abi), contractFactory.runner);
+  const fn = contract.getFunction(method);
+  const response = await (props ? fn(props) : fn());
+  console.log(`[INFO] Contract method: ${method} evaluated successfully!`);
   return response;
 }
 
@@ -52,5 +65,6 @@ export async function getGenesisBlock(): Promise<ITransactionDto> {
     prevHash: block.parentHash,
     timestamp: block.timestamp,
     nonce: block.nonce,
+    address: ''
   };
 }

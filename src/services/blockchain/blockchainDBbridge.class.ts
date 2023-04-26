@@ -1,5 +1,7 @@
-import BlockModel from "../../model/blockchain.model";
+import BlockModel, { IBlock } from "../../model/blockchain.model";
 import { Block } from "./block.class";
+import User from "../../model/user.model";
+import AllowedUsersModel from "../../model/allowed-users.model";
 
 export class BlockChainDatabaseBridge {
 
@@ -25,5 +27,20 @@ export class BlockChainDatabaseBridge {
     const model = new BlockModel(block);
     await model.save();
     return true;
+  }
+
+  public static async getAllowedBlocks(userId: string) {
+    if (!userId) {
+      return [];
+    }
+    const uuids = await AllowedUsersModel.find({ allowedUsers: { $in: userId } });
+    const mapped = uuids.map(u => u.uuid);
+    console.log(mapped)
+    if(!mapped.length) {
+      return [];
+    }
+    const documents = await BlockModel.find({uuid: { $in: mapped }});
+    console.log(documents)
+    return documents;
   }
 }
