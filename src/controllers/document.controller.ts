@@ -56,6 +56,24 @@ export class DocumentsController {
     }
   }
 
+  public async getUsersToAttach(req: Request, res: any, next: any) {
+    try {
+      const { email, profileId } = req.query;
+
+      if (!profileId) {
+        return res.status(400).json({ message: 'No profile id received' });
+      }
+
+      const users = await AllowedUsersService.getUsersToAttach(profileId as string, email as string);
+      return res.json({ users });
+
+    } catch (err) {
+      console.error(err);
+      next(err);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
   public async getFile(req: Request, res: any, next: any) {
     try {
       const { uuid, userId } = req.query;

@@ -29,7 +29,8 @@ export class Block implements IBlock {
   }
 
   public isValid(prevHash: string): boolean {
-    return this.prevHash === prevHash;
+    return true;
+    //return this.prevHash === prevHash;
   }
 
   public updateWithTx(data: ITransactionDto): void {

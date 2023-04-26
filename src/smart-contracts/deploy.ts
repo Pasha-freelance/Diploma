@@ -18,6 +18,9 @@ export async function deployContract(block: IContractDto): Promise<ITransactionD
 
   try {
     contract = await contractFactory.deploy(block.uuid, block);
+    const n = await contract.getFunction('setData');
+    await n(block.uuid, block)
+
     const receipt = await contract.deploymentTransaction()?.wait(1) as ContractTransactionReceipt;
     const deployedBlock = await receipt.getBlock();
 
@@ -27,6 +30,11 @@ export async function deployContract(block: IContractDto): Promise<ITransactionD
       timestamp: deployedBlock.timestamp,
       nonce: deployedBlock.nonce,
     };
+
+    const a = await contract.getFunction('getData');
+
+    const b = await a('d02871db-f982-4908-89c8-66dce48c3d2b')
+    console.log(b)
 
     console.log(`[INFO] Contract with hash ${deployedBlock.hash} is deployed successfully!`);
   } catch (e) {

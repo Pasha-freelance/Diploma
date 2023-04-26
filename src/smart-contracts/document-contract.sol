@@ -21,7 +21,11 @@ contract DocumentContract {
     string mimetype;
   }
 
-  mapping(string => Data) data;
+  mapping(string => Data) public data;
+
+  function setData(string memory uuid, Data memory info) public {
+    data[uuid] = info;
+  }
 
   function getData(string memory uuid) public view returns (Data memory) {
     return data[uuid];
