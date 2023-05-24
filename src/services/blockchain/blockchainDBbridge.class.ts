@@ -35,12 +35,10 @@ export class BlockChainDatabaseBridge {
     }
     const uuids = await AllowedUsersModel.find({ allowedUsers: { $in: userId } });
     const mapped = uuids.map(u => u.uuid);
-    console.log(mapped)
     if(!mapped.length) {
       return [];
     }
     const documents = await BlockModel.find({uuid: { $in: mapped }});
-    console.log(documents)
     return documents;
   }
 }

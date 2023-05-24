@@ -16,6 +16,7 @@ export class Block implements IBlock {
   public readonly uuid: string;
   public timestamp: number = 0;
   public address: string = '';
+  public createdAt: Date;
 
   private readonly NETWORK_POWER = 10000;
 
@@ -26,6 +27,7 @@ export class Block implements IBlock {
     this.docMetadata = this.docData;
     this.originUser = this._data.userId;
     this.uuid = randomUUID();
+    this.createdAt = new Date();
     console.log(`[INFO] Block instance is created`);
   }
 

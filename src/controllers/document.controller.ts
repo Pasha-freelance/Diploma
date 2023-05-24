@@ -4,6 +4,7 @@ import { DigitalDocument } from "../services/documents/document.class";
 import { Block } from "../services/blockchain/block.class";
 import { DocumentDatabaseBridge } from "../services/documents/documentDBbridge.class";
 import { AllowedUsersService } from "../services/allowedUsers/allowed-users.service";
+import { AuthorizationService } from "../services/authorization/authorization-service.class";
 
 export class DocumentsController {
 
@@ -26,8 +27,7 @@ export class DocumentsController {
           block.originUser
         );
         await document.saveDocument();
-      }
-      else new Error();
+      } else new Error();
 
       res.json({ message: 'File saved', uuid: block.uuid });
 
@@ -40,15 +40,32 @@ export class DocumentsController {
 
   public async attachAllowedUsers(req: Request, res: any, next: any) {
     try {
-      //NOTE doesn`t work with POSTMAN(works only with query params ???)
       const { uuid, allowedUsers } = req.body;
 
-      if(!uuid) {
+      if (!uuid) {
         return res.status(500).json({ message: 'No uuid for allowed users received' });
       }
       const block = await this.blockChain.getBlockByUUID(uuid);
       await AllowedUsersService.attach(uuid, block.address, allowedUsers);
-      return res.json({ message: 'Allowed users added'});
+      return res.json({ message: 'Allowed users added' });
+
+    } catch (err) {
+      console.error(err);
+      next(err);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+  public async editAllowedUsers(req: Request, res: any, next: any) {
+    try {
+      const { uuid, allowedUsers } = req.body;
+
+      if (!uuid) {
+        return res.status(500).json({ message: 'No uuid for allowed users received' });
+      }
+      const block = await this.blockChain.getBlockByUUID(uuid);
+      await AllowedUsersService.edit(uuid, block.address, allowedUsers);
+      return res.json({ message: 'Allowed users edited' });
 
     } catch (err) {
       console.error(err);
@@ -61,18 +78,55 @@ export class DocumentsController {
     try {
       const { userId } = req.query;
 
-      if(!userId) {
+      if (!userId) {
         return res.status(500).json({ message: 'No userId for allowed users received' });
       }
       const blocks = await this.blockChain.getAllowedBlocks(userId as string);
+      const authService = new AuthorizationService();
       if (blocks) {
 
-        res.json(blocks.map(block => (
-          {
+        const data = blocks.map(async (block) => {
+          const originUser = await authService.getUser({ userId: block.originUser })
+
+          return {
             originalName: block.docMetadata.originalname,
+            originUser: originUser?.response?.firstName + ' ' + originUser?.response?.lastName,
+            createdAt: block.createdAt,
             uuid: block.uuid
           }
-        )));
+        });
+
+        Promise.all(data).then(resp => {
+          res.json(resp)
+        });
+
+      } else {
+        new Error('No blocks')
+      }
+
+    } catch (err) {
+      console.error(err);
+      next(err);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+  public async getAllowedUsersForDocument(req: Request, res: any, next: any) {
+    try {
+      const { uuid } = req.query;
+
+      if (!uuid) {
+        return res.status(500).json({ message: 'No uuid for allowed users received' });
+      }
+      const users = await this.blockChain.getAllowedUsersForBlock(uuid as string);
+      if (users) {
+
+        res.json({ users: users.map(u => ({
+         email: u.email,
+         firstName: u.firstName,
+         lastName: u.lastName,
+         userId: u.userId
+        }))})
 
       } else {
         new Error('No blocks')
@@ -148,6 +202,7 @@ export class DocumentsController {
         res.json(blocks.map(block => (
           {
             originalName: block.docMetadata.originalname,
+            createdAt: block.createdAt,
             uuid: block.uuid
           }
         )));

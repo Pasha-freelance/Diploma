@@ -1,6 +1,8 @@
 import { Block } from "./block.class";
 import { BlockChainDatabaseBridge } from "./blockchainDBbridge.class";
 import { deployContract, getGenesisBlock } from '../../smart-contracts/deploy';
+import { AllowedUsersService } from "../allowedUsers/allowed-users.service";
+import { IUser } from "../../interfaces/registration-dto.interface";
 
 export class BlockChain {
 
@@ -47,6 +49,10 @@ export class BlockChain {
 
   public async getAllowedBlocks(userId: string): Promise<Block[]> {
     return await BlockChainDatabaseBridge.getAllowedBlocks(userId) as unknown as Block[];
+  }
+
+  public async getAllowedUsersForBlock(userId: string): Promise<IUser[]> {
+    return await AllowedUsersService.getAllowedUsersForBlock(userId) as unknown as IUser[];
   }
 
   private async initGenesisBlock(): Promise<void> {
